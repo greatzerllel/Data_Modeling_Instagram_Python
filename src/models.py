@@ -8,23 +8,68 @@ from eralchemy import render_er
 
 Base = declarative_base()
 
-class Person(Base):
-    __tablename__ = 'person'
-    # Here we define columns for the table person
-    # Notice that each column is also a normal Python instance attribute.
+class User(Base):
+    __tablename__ = 'users'
+    id = Column(Integer, primary_key=True)
+    name = Column(String(50), nullable=False)
+    email = Column(String(80), nullable=False)
+    password = Column(String(50), nullable=False)
+
+class Character(Base):
+    __tablename__ = 'characters'
     id = Column(Integer, primary_key=True)
     name = Column(String(250), nullable=False)
+    hair_color = Column(String(250))
+    homeworld = Column(String(250))
+    eye_color = Column(String(250))
+    gender = Column(String(250)) 
 
-class Address(Base):
-    __tablename__ = 'address'
-    # Here we define columns for the table address.
-    # Notice that each column is also a normal Python instance attribute.
+class Planet(Base):
+    __tablename__ = 'planets'
     id = Column(Integer, primary_key=True)
-    street_name = Column(String(250))
-    street_number = Column(String(250))
-    post_code = Column(String(250), nullable=False)
-    person_id = Column(Integer, ForeignKey('person.id'))
-    person = relationship(Person)
+    name = Column(String(50), nullable=False)
+    diameter = Column(String(50))
+    rotation_period = Column(String(50))
+    orbital_period = Column(String(50))
+    gravity = Column(String(50))
+    population = Column(String(50))
+    climate = Column(String(50))
+
+class Planet_terrain(Base):
+    __tablename__ = 'planets_terrains'
+    planet_id = Column(Integer, ForeignKey('planets.id'), primary_key=True)
+    terrain = Column(Integer, ForeignKey('terrains.id'),  primary_key=True)
+
+class Terrain(Base):
+    __tablename__ = 'terrains'
+    id = Column(Integer, primary_key=True)
+    name = Column(String(50), nullable=False)
+
+class Favorite(Base):
+    __tablename__ = 'favorites'
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('users.id'))
+    user = relationship(User)
+    character = relationship(Character)
+    planet = relationship(Planet)
+
+class Favorites_group(Base):
+    __tablename__ = 'favorites_group'
+    favorite_character_id = Column(Integer, ForeignKey('favorite_character.id'), primary_key=True)
+    favorite_planet_id = Column(Integer, ForeignKey('favorite_planet.id'),  primary_key=True)
+
+class Favorite_character(Base):
+    __tablename__ = 'favorite_character'
+    id = Column(Integer, primary_key=True)
+    Favorites= Column(Integer, ForeignKey('favorites.id'))
+    Character_id = Column(Integer, ForeignKey('characters.id'))
+
+class Favorite_planet(Base):
+    __tablename__ = 'favorite_planet'
+    id = Column(Integer, primary_key=True)
+    Favorites = Column(Integer, ForeignKey('favorites.id'))
+    Planets_id = Column(Integer, ForeignKey('planets.id'))
+
 
     def to_dict(self):
         return {}
