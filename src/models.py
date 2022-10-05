@@ -9,70 +9,47 @@ from eralchemy import render_er
 Base = declarative_base()
 
 class User(Base):
-    __tablename__ = 'users'
+    __tablename__ = 'user'
+    # Here we define columns for the table person
+    # Notice that each column is also a normal Python instance attribute.
     id = Column(Integer, primary_key=True)
-    name = Column(String(50), nullable=False)
-    email = Column(String(80), nullable=False)
-    password = Column(String(50), nullable=False)
+    nick_name = Column(String(50), unique=True, nullable=False)
+    first_name = Column(String(50))
+    last_name = Column(String(50))
+    email = Column(String, unique=True, nullable=False)
+    password = Column(String, unique=False, nullable=False)
 
-class Character(Base):
-    __tablename__ = 'characters'
+class Post(Base):
+    __tablename__ = 'post'
+    # Here we define columns for the table address.
+    # Notice that each column is also a normal Python instance attribute.
     id = Column(Integer, primary_key=True)
-    name = Column(String(250), nullable=False)
-    hair_color = Column(String(250))
-    homeworld = Column(String(250))
-    eye_color = Column(String(250))
-    gender = Column(String(250)) 
+    photo = Column(String, nullable=False)
+    text = Column(String(350))
+    user_id = Column(Integer, ForeignKey('user.id')) #estas 2 últimas líneas son obligatorias para hacer las relaciones
+    user = relationship('User')
 
-class Planet(Base):
-    __tablename__ = 'planets'
+class comment(Base):
+    __tablename__ = 'comment'
     id = Column(Integer, primary_key=True)
-    name = Column(String(50), nullable=False)
-    diameter = Column(String(50))
-    rotation_period = Column(String(50))
-    orbital_period = Column(String(50))
-    gravity = Column(String(50))
-    population = Column(String(50))
-    climate = Column(String(50))
+    message = Column(String(300))
+    user_id = Column(Integer, ForeignKey('user.id'))
+    user = relationship('User')
+    post_id = Column(Integer, ForeignKey('post.id'))
+    post = relationship('Post')
 
-class Planet_terrain(Base):
-    __tablename__ = 'planets_terrains'
-    planet_id = Column(Integer, ForeignKey('planets.id'), primary_key=True)
-    terrain = Column(Integer, ForeignKey('terrains.id'),  primary_key=True)
-
-class Terrain(Base):
-    __tablename__ = 'terrains'
+class direct_message(Base):
+    __tablename__ = 'direct_message'
     id = Column(Integer, primary_key=True)
-    name = Column(String(50), nullable=False)
-
-class Favorite(Base):
-    __tablename__ = 'favorites'
-    id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey('users.id'))
-    user = relationship(User)
-    character = relationship(Character)
-    planet = relationship(Planet)
-
-class Favorites_group(Base):
-    __tablename__ = 'favorites_group'
-    favorite_character_id = Column(Integer, ForeignKey('favorite_character.id'), primary_key=True)
-    favorite_planet_id = Column(Integer, ForeignKey('favorite_planet.id'),  primary_key=True)
-
-class Favorite_character(Base):
-    __tablename__ = 'favorite_character'
-    id = Column(Integer, primary_key=True)
-    Favorites= Column(Integer, ForeignKey('favorites.id'))
-    Character_id = Column(Integer, ForeignKey('characters.id'))
-
-class Favorite_planet(Base):
-    __tablename__ = 'favorite_planet'
-    id = Column(Integer, primary_key=True)
-    Favorites = Column(Integer, ForeignKey('favorites.id'))
-    Planets_id = Column(Integer, ForeignKey('planets.id'))
+    sender_id = Column(String, ForeignKey('user.id'))
+    recibed_id = Column(String, ForeignKey('user.id'))
+    message = Column(String(300))
+    user = relationship('User')
 
 
     def to_dict(self):
         return {}
+
 
 ## Draw from SQLAlchemy base
 render_er(Base, 'diagram.png')
